@@ -1,0 +1,49 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.4'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "me.paulschwarz:spring-dotenv:3.0.0"
+    implementation 'org.springframework.boot:spring-boot-starter-jersey'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-web-services'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    // Firebase Admin SDK
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
+    // Lombok (optional, but recommended for model classes)
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// build.gradle
+task buildDockerImage(type: Exec) {
+    dependsOn build
+    commandLine 'docker', 'build', '-t', 'nomadic_foodie_backend:latest', '.'
+}
+task execDockerImage(type: Exec){
+    commandLine 'docker', 'run', '--env-file', '.env', '-p', '5003:5003', 'nomadic_foodie_backend:latest'
+//    commandLine 'docker', 'run', '-e', 'FOURSQUARE_API_KEY=fsq3Zz4RYP56hBZ1/CdR24QecVD9N65RdHr1sLXY91NrElU=', '-p', '5003:5003', 'nomadic_foodie_backend:latest'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
